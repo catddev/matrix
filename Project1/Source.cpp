@@ -37,10 +37,11 @@ int main() {
 
 	Matrix<double> m2(d, 6, 5);
 	m2.print();
-	/*m2--;
-	m2.print();
-	m2++;
-	m2.print();*/
+
+	//m2--;
+	//m2.print();
+	//m2++;
+	//m2.print();
 
 	Matrix<double> m3(d, 6);
 	m3.print();
@@ -48,7 +49,8 @@ int main() {
 	//(mcopy + m3).print();
 	(m2 + 10).print();
 
-	m2.add_row();
+	m2.del_row();
+	m2.del_col();
 	m2.print();
 
 	//Matrix<int> m;

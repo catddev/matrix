@@ -49,16 +49,16 @@ public:
 	Matrix<T> operator+(Matrix<T> obj); //будет работать для классов, а не только для простых типов, только если в самих классах будет перегружен оператор+
 	Matrix<T> operator+(int k); //сработает только для простых числовых типов, не для классов
 	//унарные операторы ничего не принимают, только бинарные
-	void operator++();
-	void operator--();
+	void operator++();//
+	void operator--();//
 	T& at(int row, int col);
 	~Matrix();
 
 	int row_size();//вместо геттеров
 	int col_size();
 
-	void add_row();
-	void add_col();
+	void add_row();//
+	void add_col();//
 	void del_row();
 	void del_col();
 	void print();
