@@ -30,8 +30,6 @@ using namespace std;
 //o	Для удаления строки
 //o	Для удаления столбца
 //o	Добавить методы set и get
-//При необходимости добавить в класс другие методы.
-//Реализовать интерфейс приложения.
 
 template<typename T>
 class Matrix {
@@ -49,10 +47,10 @@ public:
 	Matrix<T> operator=(const Matrix<T>& obj);
 	void operator()();//перегрузка круглых скобок - вызов функции
 	Matrix<T> operator+(Matrix<T> obj); //будет работать для классов, а не только для простых типов, только если в самих классах будет перегружен оператор+
-	Matrix<T> operator+(int i); //сработает только для простых числовых типов, не для классов
+	Matrix<T> operator+(int k); //сработает только для простых числовых типов, не для классов
 	//унарные операторы ничего не принимают, только бинарные
-	Matrix<T> operator++();
-	Matrix<T> operator--();
+	void operator++();
+	void operator--();
 	T& at(int row, int col);
 	~Matrix();
 
@@ -117,21 +115,26 @@ inline Matrix<T>::Matrix(T * arr, int size)
 	}
 	else
 	{
-		this->rows = size % cols + 1;
-		int sub_row = size - cols * (rows - 1);
+		this->rows = (size / cols) + 1;
+		int sub_cols = size - cols*(rows-1);
+
 		els = new T*[rows];
 		for (int i = 0; i < rows; i++)
 			els[i] = new T[cols];
 
 		int k = 0;
-		for (int i = 0; i < rows; i++)
+		for (int i = 0; i < rows-1; i++)
 			for (int j = 0; j < cols; j++)
 				els[i][j] = arr[k++];
 
-		for (int i = 0; i < sub_row; i++)
-			els[rows][i] = arr[k++];
+		for (int i = 0; i < cols; i++)
+		{
+			if(i>=sub_cols)
+				els[rows - 1][i] = 0;//empty elements are filled with 0
+			else
+				els[rows - 1][i] = arr[k++];
+		}	
 	}
-	//return *this;
 }
 
 template<typename T>
@@ -140,11 +143,14 @@ inline Matrix<T>::Matrix(T *arr, int size, int rows)//просто размно�
 	this->rows = rows;
 	this->cols = size;
 	els = new T*[rows];
-	for (int i = 0; i < rows; i++) {
+	for (int i = 0; i < rows; i++)
 		els[i] = new T[cols];
-		els[i] = arr;
-	}
-	//return *this;
+
+	int k = 0;
+	for (int i = 0; i < rows; i++)
+		for (int j = 0; j < cols; j++)
+			els[i][j] = arr[j];
+
 }
 
 template<typename T>
@@ -196,10 +202,10 @@ inline Matrix<T> Matrix<T>::operator+(Matrix<T> obj)
 	for (int i = 0; i < tmp.rows; i++) {
 		for (int j = 0; j < tmp.cols; j++) {
 			if (!els[i][j])//???
-				tmp[i][j] = obj.els[i][j];
+				tmp.els[i][j] = obj.els[i][j];
 			if (!obj.els[i][j])//???
-				tmp[i][j] = els[i][j];
-			tmp[i][j] = els[i][j] + obj.els[i][j];
+				tmp.els[i][j] = els[i][j];
+			tmp.els[i][j] = els[i][j] + obj.els[i][j];
 		}
 	}
 
@@ -207,26 +213,26 @@ inline Matrix<T> Matrix<T>::operator+(Matrix<T> obj)
 }
 
 template<typename T>
-inline Matrix<T> Matrix<T>::operator+(int i)
+inline Matrix<T> Matrix<T>::operator+(int k)
 {
 	for (int i = 0; i < rows; i++)
 		for (int j = 0; j < cols; j++)
-			els[i][j] += i;
+			els[i][j] += k;
 	return *this;
 }
 
 template<typename T>
-inline Matrix<T> Matrix<T>::operator++()//добавляем строку в конец
+inline void Matrix<T>::operator++()//добавляем строку в конец
 {
 	add_row();
-	return *this;
+	//return *this;
 }
 
 template<typename T>
-inline Matrix<T> Matrix<T>::operator--()//удаляем строку с конца
+inline void Matrix<T>::operator--()//удаляем строку с конца
 {
 	del_row();
-	return *this;
+	//return *this;
 }
 
 template<typename T>
@@ -272,7 +278,7 @@ inline void Matrix<T>::add_row()
 		tmp.els[rows][i] = 0;
 
 	delete[] els;
-	els = tmp;
+	els = tmp.els;
 	rows++;
 }
 
@@ -293,7 +299,7 @@ inline void Matrix<T>::add_col()
 		}
 	}
 	delete[] els;
-	els = tmp;
+	els = tmp.els;
 	cols++;
 }
 
