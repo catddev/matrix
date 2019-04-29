@@ -49,8 +49,8 @@ public:
 	Matrix<T> operator+(Matrix<T> obj); //будет работать для классов, а не только для простых типов, только если в самих классах будет перегружен оператор+
 	Matrix<T> operator+(int k); //сработает только для простых числовых типов, не для классов
 	//унарные операторы ничего не принимают, только бинарные
-	Matrix<T>& operator++();//если ничего не принимает, то будет ПРЕИНКРЕМЕНТОМ
-	Matrix<T>& operator--(int v);//а если принимает любой аргумент(который потом никакой роли не играет), будет ПОСТДЕКРЕМЕНТ
+	Matrix<T> operator++();//если ничего не принимает, то будет ПРЕИНКРЕМЕНТОМ
+	Matrix<T> operator--(int v);//а если принимает любой аргумент(который потом никакой роли не играет), будет ПОСТДЕКРЕМЕНТ
 	T& at(int row, int col);
 	//~Matrix();
 	// почему при наличии деструктора не работают методы add row, add col
@@ -237,14 +237,14 @@ inline Matrix<T> Matrix<T>::operator+(int k)
 }
 
 template<typename T>
-inline Matrix<T> & Matrix<T>:: operator++()//добавляем строку в конец
+inline Matrix<T>  Matrix<T>:: operator++()//добавляем строку в конец
 {
 	this->add_row();//void
 	return *this;
 }
 
 template<typename T>
-inline Matrix<T> & Matrix<T>:: operator--(int v)//удаляем строку с конца
+inline Matrix<T>  Matrix<T>:: operator--(int v)//удаляем строку с конца
 {
 	this->del_row();
 	return *this;
