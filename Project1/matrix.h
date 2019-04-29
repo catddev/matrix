@@ -45,14 +45,15 @@ public:
 	Matrix(T *arr, int size, int rows);
 	Matrix(const Matrix<T>& obj);
 	Matrix<T> operator=(const Matrix<T>& obj);
-	void operator()();//перегрузка круглых скобок - вызов функции
+	void operator()(T obj);//перегрузка круглых скобок - вызов функции; если для сложного типа, то при вызове сначала явно указать тип
 	Matrix<T> operator+(Matrix<T> obj); //будет работать для классов, а не только для простых типов, только если в самих классах будет перегружен оператор+
 	Matrix<T> operator+(int k); //сработает только для простых числовых типов, не для классов
 	//унарные операторы ничего не принимают, только бинарные
-	void operator++();//
-	void operator--();//
+	Matrix<T>& operator++();//если ничего не принимает, то будет ПРЕИНКРЕМЕНТОМ
+	Matrix<T>& operator--(int v);//а если принимает любой аргумент(который потом никакой роли не играет), будет ПОСТДЕКРЕМЕНТ
 	T& at(int row, int col);
-	~Matrix();
+	//~Matrix();
+	// почему при наличии деструктора не работают методы add row, add col
 
 	int row_size();//вместо геттеров
 	int col_size();
@@ -61,6 +62,7 @@ public:
 	void add_col();//
 	void del_row();
 	void del_col();
+	void random();
 	void print();
 
 	friend istream& operator>>(istream& is, Matrix<T>& obj);
@@ -73,11 +75,12 @@ template<typename T>
 ostream& operator<<(ostream& os, Matrix<T> obj);
 
 template<typename T>
-inline Matrix<T>::Matrix()
+inline Matrix<T>::Matrix()//чтобы давал минимальную память, иначе если по 0 все, нет смысла в конструкторе по умолчанию
 {
-	els = 0;
-	cols = 0;
-	rows = 0;
+	cols = 1;
+	rows = 1;
+	els = new T*[rows];
+	els[0] = new T[cols];
 }
 
 template<typename T>
@@ -116,24 +119,24 @@ inline Matrix<T>::Matrix(T * arr, int size)
 	else
 	{
 		this->rows = (size / cols) + 1;
-		int sub_cols = size - cols*(rows-1);
+		int sub_cols = size - cols * (rows - 1);
 
 		els = new T*[rows];
 		for (int i = 0; i < rows; i++)
 			els[i] = new T[cols];
 
 		int k = 0;
-		for (int i = 0; i < rows-1; i++)
+		for (int i = 0; i < rows - 1; i++)
 			for (int j = 0; j < cols; j++)
 				els[i][j] = arr[k++];
 
 		for (int i = 0; i < cols; i++)
 		{
-			if(i>=sub_cols)
+			if (i >= sub_cols)
 				els[rows - 1][i] = 0;//empty elements are filled with 0
 			else
 				els[rows - 1][i] = arr[k++];
-		}	
+		}
 	}
 }
 
@@ -182,11 +185,11 @@ inline Matrix<T> Matrix<T>::operator=(const Matrix<T> & obj)
 }
 
 template<typename T>
-inline void Matrix<T>::operator()()
+inline void Matrix<T>::operator()(T obj)
 {
 	for (int i = 0; i < rows; i++)
 		for (int j = 0; j < cols; j++)
-			els[i][j] = rand() % 21;
+			els[i][j] = obj;
 }
 
 template<typename T>
@@ -197,42 +200,54 @@ inline Matrix<T> Matrix<T>::operator+(Matrix<T> obj)
 	tmp.cols = cols > obj.cols ? cols : obj.cols;
 	tmp.els = new T*[tmp.rows];
 	for (int i = 0; i < tmp.rows; i++)
-		els[i] = new T[tmp.cols];
+		tmp.els[i] = new T[tmp.cols];
 
 	for (int i = 0; i < tmp.rows; i++) {
 		for (int j = 0; j < tmp.cols; j++) {
-			if (!els[i][j])//???
+			if ((i >= rows && j >= obj.cols) || (i >= obj.rows && j >= cols))//это условие обязательно должно выполняться первым! иначе перекликается с менее точными нижними условиями
+			{
+				tmp.els[i][j] = 0;
+				continue;
+			}
+			if (i >= rows || j >= cols)
+			{
 				tmp.els[i][j] = obj.els[i][j];
-			if (!obj.els[i][j])//???
+				continue;
+			}
+			if (i >= obj.rows || j >= obj.cols)
+			{
 				tmp.els[i][j] = els[i][j];
+				continue;
+			}
+
 			tmp.els[i][j] = els[i][j] + obj.els[i][j];
 		}
 	}
-
 	return tmp;
 }
 
 template<typename T>
 inline Matrix<T> Matrix<T>::operator+(int k)
 {
-	for (int i = 0; i < rows; i++)
-		for (int j = 0; j < cols; j++)
-			els[i][j] += k;
+	Matrix tmp(*this);
+	for (int i = 0; i < tmp.rows; i++)
+		for (int j = 0; j < tmp.cols; j++)
+			tmp.els[i][j] += k;
+	return tmp;
+}
+
+template<typename T>
+inline Matrix<T> & Matrix<T>:: operator++()//добавляем строку в конец
+{
+	this->add_row();//void
 	return *this;
 }
 
 template<typename T>
-inline void Matrix<T>::operator++()//добавляем строку в конец
+inline Matrix<T> & Matrix<T>:: operator--(int v)//удаляем строку с конца
 {
-	add_row();
-	//return *this;
-}
-
-template<typename T>
-inline void Matrix<T>::operator--()//удаляем строку с конца
-{
-	del_row();
-	//return *this;
+	this->del_row();
+	return *this;
 }
 
 template<typename T>
@@ -242,13 +257,13 @@ inline T & Matrix<T>::at(int row, int col)
 }
 
 
-template<typename T>
-inline Matrix<T>::~Matrix()
-{
-	for (int i = 0; i < rows; i++)
-		delete[] els[i];
-	delete[] els;
-}
+//template<typename T>
+//inline Matrix<T>::~Matrix()
+//{
+//	for (int i = 0; i < rows; i++)
+//		delete[] els[i];
+//	delete[] els;
+//}
 
 template<typename T>
 inline int Matrix<T>::row_size()
@@ -269,15 +284,22 @@ inline void Matrix<T>::add_row()
 	tmp.rows = rows + 1;
 	tmp.cols = cols;
 	tmp.els = new T*[tmp.rows];
+	for (int i = 0; i < tmp.rows; i++)
+		tmp.els[i] = new T[tmp.cols];
+
+	for (int i = 0; i < tmp.rows; i++) {
+		for (int j = 0; j < tmp.cols; j++) {
+			if (i == tmp.rows - 1)
+				tmp.els[i][j] = 888;
+			else
+				tmp.els[i][j] = els[i][j];
+		}
+	}
+
 	for (int i = 0; i < rows; i++)
-		tmp.els[i] = els[i];
-
-	tmp.els[rows] = new T[cols];
-
-	for (int i = 0; i < cols; i++)
-		tmp.els[rows][i] = 0;
-
+		delete[] els[i];
 	delete[] els;
+
 	els = tmp.els;
 	rows++;
 }
@@ -293,12 +315,18 @@ inline void Matrix<T>::add_col()
 		tmp.els[i] = new T[tmp.cols];
 
 	for (int i = 0; i < tmp.rows; i++) {
-		for (int j = 0; i < tmp.cols; i++) {
-			tmp.els[i][j] = els[i][j];
-			tmp.els[i][tmp.cols - 1] = 777;
+		for (int j = 0; j < tmp.cols; j++) {
+			if (j == tmp.cols - 1)
+				tmp.els[i][j] = 777;
+			else
+				tmp.els[i][j] = els[i][j];
 		}
 	}
+
+	for (int i = 0; i < rows; i++)
+		delete[] els[i];
 	delete[] els;
+
 	els = tmp.els;
 	cols++;
 }
@@ -313,6 +341,14 @@ template<typename T>
 inline void Matrix<T>::del_col()
 {
 	cols--;
+}
+
+template<typename T>
+inline void Matrix<T>::random()
+{
+	for (int i = 0; i < rows; i++)
+		for (int j = 0; j < cols; j++)
+			els[i][j] = rand() % 21;
 }
 
 template<typename T>

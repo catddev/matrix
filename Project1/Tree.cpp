@@ -14,6 +14,6 @@ Tree::Tree(int h, string l)
 
 ostream & operator<<(ostream & os, Tree obj)
 {
-	os << obj.height << " " << obj.location << endl;
+	os << obj.height << " " << obj.location;
 	return os;
 }

@@ -3,22 +3,48 @@
 
 int main() {
 
-	//test with double, string, class
-
 	srand(time(NULL));
 
 	Matrix<int> m1;
 	//Matrix<char> m3;
-	//Matrix<Tree> m4;
+
+	Tree t(2, "Asia");
+	Matrix<Tree> mt(3, 3, t);
+	for (int i = 0; i < mt.row_size(); i++) {
+		for (int j = 0; j < mt.col_size(); j++) {
+			cout << mt.at(i, j) << "		";
+		}
+		cout << endl;
+	}
+	cout << endl;
+
+	Matrix<Tree> mt2;
+	mt2 = mt;
+	mt2.del_row();
+	mt2.del_col();
+	mt2(Tree(5, "Africa"));//operator()
+	for (int i = 0; i < mt2.row_size(); i++) {
+		for (int j = 0; j < mt2.col_size(); j++) {
+			cout << mt2.at(i, j) << "	";
+		}
+		cout << endl;
+	}
+	cout << endl;
+
 
 	Matrix<double> m(4, 5, 0);
 	Matrix<double> mcopy(m);
 	mcopy.print();
 
-	m();//why not ()()
+	m(4.5);
 	mcopy = m;
 
-	/*cout << "fill your matrix: " << endl;
+	Matrix<int> m5(10, 10, 0);
+	m5.random();
+	m5.print();
+
+	//friend operator>>
+	/*cout << "fill your matrix manually: " << endl;
 	for (int i = 0; i < m.row_size(); i++)
 		for (int j = 0; j < m.col_size(); j++)
 			cin >> m.at(i, j);*/
@@ -33,110 +59,32 @@ int main() {
 	cout << endl;
 
 	const int n = 6;
-	double* d= new double[n]{1, 2, 3, 4, 5, 6};
+	double* d = new double[n] {1, 2, 3, 4, 5, 6};
 
 	Matrix<double> m2(d, 6, 5);
 	m2.print();
 
-	//m2--;
-	//m2.print();
-	//m2++;
-	//m2.print();
+	++m2;
+	m2.print();
+	m2--;
+	m2.print();
 
 	Matrix<double> m3(d, 6);
 	m3.print();
+	Matrix<double>m4;
+	m4 = (mcopy + m3);
+	cout << "SUMMARY:" << endl;
+	m4.print();
 
-	//(mcopy + m3).print();
-	(m2 + 10).print();
+	m2 = m2 + 10;
+	m2.print();
 
 	m2.del_row();
 	m2.del_col();
 	m2.print();
-
-	//Matrix<int> m;
-	//Matrix<double> m;
-	//Matrix<char> m;
-	//Matrix<Tree> m;
-	//int choice;
-	//while (true) {
-	//	cout << "Enter 1 to construct new matrix" << endl;
-	//	cout << "Enter 2 to fill your matrix randomly" << endl;
-	//	cout << "Enter 3 to add matrix with matrix or matrix with number" << endl;
-	//	cout << "Enter 4 to add a new row" << endl;
-	//	cout << "Enter 5 to add a new column" << endl;
-	//	cout << "Enter 6 to delete a row" << endl;
-	//	cout << "Enter 7 to delete a column" << endl;
-	//	cout << "Enter 8 to fill your matrix manually" << endl;
-	//	cout << "Enter 9 to print your matrix" << endl;
-	//	cout << "Enter 0 to exit" << endl;
-	//	cin >> choice;
-	//	if (choice == 0) break;
-	//	switch (choice)
-	//	{
-	//	case 1:
-	//		cout << "Choose type of matrix:" << endl;
-	//		cout << "1 - int" << endl;
-	//		cout << "2 - double" << endl;
-	//		cout << "3 - char/string" << endl;//???
-	//		cout << "4 - class Tree" << endl;
-	//		int x;
-	//		cin >> x;
-	//		if (x == 1)
-	//		{
-	//			Matrix<int> m1(4, 5, 0);
-	//			//m = m1;
-	//		}
-	//		else if (x == 2)
-	//		{
-	//			Matrix<double> m2(5, 5, 0);
-	//			//m = m2;
-	//		}
-	//		else if (x == 3)
-	//		{
-	//			Matrix<char> m3(6, 6, 'a');
-	//			//m = m3;
-	//		}
-	//		else if (x == 4)
-	//		{
-	//			//Matrix<Tree> m4(3, 3, (4, "Derevo"));
-	//			//m=m4;
-	//		}
-	//		break;
-	//	case 2:
-	//		m();
-	//		break;
-	//	case 3:
-	//	
-	//		break;
-	//	case 4:
-	//		
-	//		break;
-	//	case 5:
-	//		
-	//		break;
-	//	case 6:
-	//		
-	//		break;
-	//	case 7:
-	//		break;
-	//	case 8:
-	//		cout << "fill your matrix: " << endl;
-	//		for (int i = 0; i < m.row_size(); i++)
-	//			for (int j = 0; j < m.col_size(); j++)
-	//				cin >> m.at(i, j);
-	//		break;
-	//	case 9:
-	//		cout << "MATRIX" << endl;
-	//		for (int i = 0; i < m.row_size(); i++) {
-	//			for (int j = 0; j < m.col_size(); j++) {
-	//				cout << setw(3) << left << m.at(i, j) << " ";
-	//			}
-	//			cout << endl;
-	//		}
-	//		cout << endl;
-	//		break;
-	//	}
-	//}
+	m2.add_row();
+	m2.add_col();
+	m2.print();
 
 	system("pause");
 	return 0;
