@@ -79,12 +79,13 @@ int main() {
 	m2 = m2 + 10;
 	m2.print();
 
+	Matrix <double> m111;
 	m2.del_row();
 	m2.del_col();
 	m2.print();
-	m2.add_row();
-	m2.add_col();
-	m2.print();
+	m111=m2.add_row();
+	m111=m111.add_col();
+	m111.print();
 
 	system("pause");
 	return 0;

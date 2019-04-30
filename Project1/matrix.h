@@ -52,14 +52,15 @@ public:
 	Matrix<T> operator++();//если ничего не принимает, то будет ПРЕИНКРЕМЕНТОМ
 	Matrix<T> operator--(int v);//а если принимает любой аргумент(который потом никакой роли не играет), будет ПОСТДЕКРЕМЕНТ
 	T& at(int row, int col);
-	//~Matrix();
-	// почему при наличии деструктора не работают методы add row, add col
+	~Matrix();
 
 	int row_size();//вместо геттеров
 	int col_size();
 
-	void add_row();//
-	void add_col();//
+	//здесь делаем возвращаемый тип Matrix<T> чтобы вернул tmp матрицу
+	//иначе если сделать void, как del_row(), del_col(), то деструктор неправильно работает и ломает прогу
+	Matrix<T> add_row();
+	Matrix<T> add_col();
 	void del_row();
 	void del_col();
 	void random();
@@ -239,7 +240,7 @@ inline Matrix<T> Matrix<T>::operator+(int k)
 template<typename T>
 inline Matrix<T>  Matrix<T>:: operator++()//добавляем строку в конец
 {
-	this->add_row();//void
+	this->add_row();
 	return *this;
 }
 
@@ -257,13 +258,13 @@ inline T & Matrix<T>::at(int row, int col)
 }
 
 
-//template<typename T>
-//inline Matrix<T>::~Matrix()
-//{
-//	for (int i = 0; i < rows; i++)
-//		delete[] els[i];
-//	delete[] els;
-//}
+template<typename T>
+inline Matrix<T>::~Matrix()
+{
+	for (int i = 0; i < rows; i++)
+		delete[] els[i];
+	delete[] els;
+}
 
 template<typename T>
 inline int Matrix<T>::row_size()
@@ -278,7 +279,7 @@ inline int Matrix<T>::col_size()
 }
 
 template<typename T>
-inline void Matrix<T>::add_row()
+inline Matrix<T> Matrix<T>::add_row()
 {
 	Matrix tmp;
 	tmp.rows = rows + 1;
@@ -295,17 +296,11 @@ inline void Matrix<T>::add_row()
 				tmp.els[i][j] = els[i][j];
 		}
 	}
-
-	for (int i = 0; i < rows; i++)
-		delete[] els[i];
-	delete[] els;
-
-	els = tmp.els;
-	rows++;
+	return tmp;
 }
 
 template<typename T>
-inline void Matrix<T>::add_col()
+inline Matrix<T> Matrix<T>::add_col()
 {
 	Matrix tmp;
 	tmp.rows = rows;
@@ -322,13 +317,7 @@ inline void Matrix<T>::add_col()
 				tmp.els[i][j] = els[i][j];
 		}
 	}
-
-	for (int i = 0; i < rows; i++)
-		delete[] els[i];
-	delete[] els;
-
-	els = tmp.els;
-	cols++;
+	return tmp;
 }
 
 template<typename T>
