@@ -22,6 +22,7 @@ int main() {
 	mt2 = mt;
 	mt2.del_row();
 	mt2.del_col();
+	//перегрузка круглых скобок - вызов функции; если для сложного типа, то при вызове сначала явно указать тип
 	mt2(Tree(5, "Africa"));//operator()
 	for (int i = 0; i < mt2.row_size(); i++) {
 		for (int j = 0; j < mt2.col_size(); j++) {
